@@ -1,8 +1,15 @@
+import sys
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QLineEdit, QTextEdit, QPushButton
+)
+from PyQt5.QtCore import Qt
 from substitution_ciphers import Substition_Ciphers
+from gui import GUI
 
-substituion_ciphers = Substition_Ciphers()
+#TODO: add color schemes to the gui
 
-if substituion_ciphers.check_text():
-    if substituion_ciphers.check_method():
-        bruh = substituion_ciphers.encrypt()
-print(bruh)
+if __name__ == '__main__':
+    app = QApplication(sys.argv)  # Create the application
+    sus = Substition_Ciphers()  # Instantiate the Substition_Ciphers class
+    window = GUI(sus)  # Create the GUI window
+    sys.exit(app.exec_())  # Start the application event loop
