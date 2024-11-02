@@ -4,9 +4,12 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 from substitution_ciphers import Substition_Ciphers
+from polyalphabetic_ciphers import Polyalphabetic_Ciphers
+
+#TODO: reduce the input_text line in encryption/decryption for the substitution ciphers
 
 class GUI(QWidget):
-    def __init__(self, substitution_ciphers: Substition_Ciphers):
+    def __init__(self, substitution_ciphers: Substition_Ciphers, polyalphabetic_ciphers: Polyalphabetic_Ciphers):
         """
         Initialize the GUI for the cryptography application.
 
@@ -15,10 +18,11 @@ class GUI(QWidget):
         """
         super().__init__()
         self.substitution_ciphers = substitution_ciphers  # Store the instance of substitution ciphers
+        self.polyalphabetic_ciphers = polyalphabetic_ciphers
         self.item_name = None  # Variable to hold the currently selected encryption method
         
-        # Set window title
-        self.setWindowTitle("Learn Cryptography 101")
+        
+        self.setWindowTitle("Learn Cryptography 101") # Set window title
         
         # Create tree widget for displaying encryption methods
         self.encryption_tree_widget = QTreeWidget(self)
@@ -41,41 +45,28 @@ class GUI(QWidget):
         self.output_text.setReadOnly(True)  # Set the output text box to read-only
         
         # Create input line for user input
-        self.input_line = QLineEdit(self)
-        self.input_line.move(500, 50)  # Position of the input line
-        self.input_line.setFixedSize(800, 25)  # Fixed size for the input line
-        
-        # create a default button for the languages
-        self.button_default = QPushButton(self)
-        self.button_default.setText("Default")
-        self.button_default.move(375, 100)
-        self.button_default.setCheckable(True)
+        self.input_line_first = QLineEdit(self)
+        self.input_line_first.move(500, 50)  # Position of the input line
+        self.input_line_first.setFixedSize(500, 25)  # Fixed size for the input line
 
-        # create a English button for the languages
-        self.button_english = QPushButton(self)
-        self.button_english.setText("English")
-        self.button_english.move(375, 150)
-        self.button_english.setCheckable(True)
-
-        # create a button group and add buttons to the group
-        self.button_group = QButtonGroup(self)
-        self.button_group.addButton(self.button_default)
-        self.button_group.addButton(self.button_english)
-
-        # connect the button group to a function
-        self.button_group.buttonClicked.connect(self.on_button_clicked)
+        # create a second input line for the user
+        self.input_line_second = QLineEdit(self)
+        self.input_line_second.move(1025, 50)
+        self.input_line_second.setFixedSize(275, 25)
 
         # Populate the tree with encryption methods and connect signals
         self.populate_tree()  # Call to populate the tree widget
-        self.input_line.returnPressed.connect(self.process_input)  # Connect return pressed signal to the handler
+        self.input_line_first.returnPressed.connect(self.process_input)  # Connect return pressed signal to the handler
+        self.input_line_second.returnPressed.connect(self.process_input)
 
         # all the possible encryption/decryption methods for the getattr function
-        self.all_encryption_functions: list[str] = ["caeser_cipher", "random_substition"]
-        self.all_decryption_functions: list[str] = ["brute_force_caesers_cipher"]
+        self.encryption_substitution_functions: list[str] = ["caeser_cipher", "random_substition", ""]
+        self.decryption_substitution_functions: list[str] = ["brute_force_caesers_cipher"]
 
 
         # Show the application window in fullscreen
-        self.showFullScreen()
+        #self.showFullScreen()
+        self.show()
 
     def process_input(self):
         """
@@ -85,22 +76,34 @@ class GUI(QWidget):
         the results in the output text box.
         """
         if self.item_name:  # Check if an encryption method is selected
-            input_text = self.input_line.text()  # Get the text from the input line
-            if self.item_name in self.all_encryption_functions:
-                # Encrypt the input text using the selected method
-                encrypted_text = self.substitution_ciphers.encrypt(self.item_name, input_text)
-                # Append the input and encrypted text to the output text box
-                self.output_text.append(f"Input: {input_text}")
-                self.output_text.append(f"Encrypted ({self.item_name}): {encrypted_text}\n")
-            else:
-                # decrypt the input text using the selected method
-                decrypted_text = self.substitution_ciphers.decrypt(self.item_name, input_text)
-                # append the input and decrypted text to the output text box
-                self.output_text.append(f"Input: {input_text}")
-                self.output_text.append(f"Decrypted: ({self.item_name}) : {decrypted_text}")
+            if (self.item_name in self.encryption_substitution_functions) or (self.item_name in self.decryption_substitution_functions):
+                input_text = self.input_line_first.text()  # Get the text from the input line
+                if self.item_name in self.encryption_substitution_functions:
+                    # Encrypt the input text using the selected method
+                    encrypted_text = self.substitution_ciphers.encrypt(self.item_name, input_text)
+                    # Append the input and encrypted text to the output text box
+                    self.output_text.append(f"Input: {input_text}")
+                    self.output_text.append(f"Encrypted ({self.item_name}): {encrypted_text}\n")
+                else:
+                    # decrypt the input text using the selected method
+                    decrypted_text = self.substitution_ciphers.decrypt(self.item_name, input_text)
+                    # append the input and decrypted text to the output text box
+                    self.output_text.append(f"Input: {input_text}")
+                    self.output_text.append(f"Decrypted: ({self.item_name}) : {decrypted_text}")
+
+            elif (self.item_name in self.polyalphabetic_ciphers.encryption_polyalphabetic_functions) or (self.item_name in self.polyalphabetic_ciphers.decryption_polyalphabetic_functions):
+                self.polyalphabetic_ciphers.input_text = self.input_line_first.text().upper()  # Get the text from the input line
+                self.polyalphabetic_ciphers.key = self.input_line_second.text().upper()
+                print("inputting done")
+                if self.item_name in self.polyalphabetic_ciphers.encryption_polyalphabetic_functions:
+                    print("condition done")
+                    self.polyalphabetic_ciphers.encrypted_final_text = self.polyalphabetic_ciphers.encrypt(self.item_name)
+                    self.output_text.append(f"Input: {self.polyalphabetic_ciphers.input_text}")
+                    self.output_text.append(f"Encrypted ({self.item_name}): {self.polyalphabetic_ciphers.encrypted_final_text}\n")
         else:
             self.output_text.append("Please select an encryption/decryption method first.\n")  # Warning if no method is selected
-        self.input_line.clear()  # Clear the input line after processing
+        self.input_line_first.clear()  # Clear the input line after processing
+        self.input_line_second.clear()
 
     def on_item_clicked(self, item: QTreeWidgetItem, column: int):
         """
@@ -121,17 +124,17 @@ class GUI(QWidget):
         Populate the tree widget with encryption methods.
         Adds a parent item for substitution methods and its child items.
         """
-        substitution_methods = QTreeWidgetItem(self.encryption_tree_widget, ["Substitution Methods"])  # Parent item
-        QTreeWidgetItem(substitution_methods, ["caeser_cipher"])  # Child item for Caesar cipher
-        QTreeWidgetItem(substitution_methods, ["random_substition"])  # Child item for random substitution
+        substitution_ciphers = QTreeWidgetItem(self.encryption_tree_widget, ["Substitution Ciphers"])  # Parent item
+        QTreeWidgetItem(substitution_ciphers, ["caeser_cipher"])  # Child item for Caesar cipher
+        QTreeWidgetItem(substitution_ciphers, ["random_substition"])  # Child item for random substitution
+
+        polyalphabetic_ciphers = QTreeWidgetItem(self.encryption_tree_widget, ["Polyalphabetic Ciphers"])
+        QTreeWidgetItem(polyalphabetic_ciphers, ["vigenere_cipher"])
 
         decryption_methods = QTreeWidgetItem(self.decryption_tree_widget, ["Decryption Methods"])
         QTreeWidgetItem(decryption_methods, ["brute_force_caesers_cipher"])
 
         self.encryption_tree_widget.expandAll()  # Expand all items in the tree widget
-
-    def on_button_clicked(self, button: QPushButton):
-        self.substitution_ciphers.decryption_language = button.text()
 
     def keyPressEvent(self, event):
         """
@@ -147,7 +150,9 @@ class GUI(QWidget):
 
 # just testing it is here, normally should be in main.py
 if __name__ == '__main__':
+
     app = QApplication(sys.argv)  # Create the application
     sus = Substition_Ciphers()  # Instantiate the Substition_Ciphers class
-    window = GUI(sus)  # Create the GUI window
+    baka = Polyalphabetic_Ciphers()
+    window = GUI(sus, baka)  # Create the GUI window
     sys.exit(app.exec_())  # Start the application event loop
