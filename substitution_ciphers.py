@@ -1,4 +1,3 @@
-from nltk.corpus import words
 import random
 
 #TODO: learn and add frequency analysis
@@ -8,13 +7,8 @@ class Substition_Ciphers():
 
     def __init__(self):
 
-
-        #  all the gramatically correct english words
-        self.words: list[str] = words.words()
-
         # all uppercase letters from the english dictionary
         self.uppercase_letters: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
         # a dictionary to change the letters with substitioned letters
         self.encryption_letter_mapping: dict = {}
 
@@ -45,120 +39,6 @@ class Substition_Ciphers():
         # all the possible decryption functions for the Substition_Cipher
         self.all_decryption_functions: list[str] = ["brute_force_caesers_cipher"]
 
-        # language of the decryption
-        self.decryption_language: str = None
-
-    def check_input_text(self) -> bool:
-        """Prompts the user to input a text to encrypt and checks if all words are valid English words.
-
-        Returns:
-            bool: True if all words are valid English words; otherwise, continues to prompt the user.
-        """
-        # loop doesn't end, until all the words are english
-        is_text: bool = False
-
-        while not(is_text):
-
-            # get the text as a input from the user
-            self.encryption_text: str = input("Write a text to encrypt : ")
-
-            # assume that the text is true(if not, the loop continues)
-            is_text = True
-
-            # seperate the words in a text and add them to a list[str]
-            seperate_words: list[str] = self.encryption_text.split()
-
-            # check, whether all words are indeed english words
-            for word in seperate_words:
-                if word not in self.words:
-                    print("The text consist foreign/unknown words, please write a text only consisting of english words")
-                    print()
-                    is_text = False
-                    continue
-        
-        return True
-
-    def check_encryption_method(self) -> bool:
-        """Prompts the user to select an encryption method from the available methods and checks if the input is valid.
-
-        Returns:
-            bool: True if the selected method is valid; otherwise, continues to prompt the user.
-        """
-        # loop doesn't end, until the method is present in the functions of this class(self.all_encryption_functions)
-        is_method: bool = False
-
-        while not(is_method):
-
-            print()
-
-            # write all the possible functions to user, to choose from
-            [print(function) for function in self.all_encryption_functions]
-            print("--------------------------------")
-
-            # get the method as a input from the user
-            self.encryption_method: str = input("Write a method to use for encryption(possible methods are listed above): ")
-            print()
-
-            # assume that, the given method is present in the functions
-            is_method = True
-
-            # check, whether the method is actually present, if not ask again
-            if self.encryption_method not in self.all_encryption_functions:
-                print("The method is not embedded in this class, so it can not be called. Please give an appropiate Method")
-                is_method = False
-
-        return True
-
-    def check_decrypted_text(self) -> bool:
-        """Checks if the decrypted text consists entirely of valid English words.
-
-        Returns:
-            bool: True if all words in the decrypted text are valid; False otherwise.
-        """
-        # seperate the words in a text and add them to a list[str]
-        #*  The list comprehension automatically collects these lowercase words into a new list 
-        #*   without needing to explicitly use append(). The list comprehension does the work of creating a new list behind the scenes.
-        separate_words: list[str] = [word.lower() for word in self.decrypted_final_text.split()]
-
-        # checks whether the text makes sense
-        for word in separate_words:
-            if word not in self.words:
-                return False
-        
-        # if it makes sense, return a "True" boolean
-        return True
-
-    def check_decryption_method(self) -> bool:
-        """Prompts the user to select an decryption method from the available methods and checks if the input is valid.
-
-        Returns:
-            bool: True if the selected method is valid; otherwise, continues to prompt the user.
-        """
-        # loop doesn't end, until the method is present in the functions of this class(self.all_decryption_functions)
-        is_method: bool = False
-
-        while not(is_method):
-
-            print()
-
-            # write all the possible functions to user, to choose from
-            [print(function) for function in self.all_decryption_functions]
-            print("--------------------------------")
-
-            # get the method as a input from the user
-            self.decryption_method: str = input("Write a method to use for decryption(possible methods are listed above): ")
-            print()
-
-            # assume that, the given method is present in the functions
-            is_method = True
-
-            # check, whether the method is actually present, if not ask again
-            if self.decryption_method not in self.all_decryption_functions:
-                print("The method is not embedded in this class, so it can not be called. Please give an appropiate Method")
-                is_method = False
-
-        return True        
-    
     def encrypt(self, encryption_method: str, input_text: str) -> str:
         """Encrypts the input text using the selected encryption method.
 
@@ -240,7 +120,7 @@ class Substition_Ciphers():
         """Attempts to decrypt the encrypted text by trying all possible shifts for Caesar's cipher.
 
         Appends the decrypted text for each shift to `self.decrypted_final_text`.
-        Only appends valid English words when `decryption_language` is set to 'English'.
+
         """
         # Reset the list of decrypted texts
         self.decrypted_final_text = []
@@ -266,18 +146,9 @@ class Substition_Ciphers():
                 for char in self.decryption_text.upper()
             )
 
-            # Handle different language decryption strategies
-            if self.decryption_language == "Default":
-                self.decrypted_final_text.append(decrypted_final_text_example)
-            elif self.decryption_language == "English":
-                # Split the decrypted text into words and check if all words are valid
-                words_in_text = decrypted_final_text_example.split()
-                for word in words_in_text:
-                    word = word.lower()
-                    if word in self.words:
-                        word = word.upper()
-                        self.decrypted_final_text.append(word)
-                        
+            # output the result 
+            self.decrypted_final_text.append(decrypted_final_text_example)
+
         return self.decrypted_final_text
 
 
